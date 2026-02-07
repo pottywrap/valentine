@@ -18,11 +18,13 @@
         }
 
         .header-img {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover; /* This crops the image nicely without stretching it */
+            width: 100%; /* It will fill the width of the card */
+            height: auto; /* This is crucial! It lets the height adjust naturally so it doesn't stretch */
+            max-height: 50vh; /* Optional safety: Prevents a ridiculously tall portrait photo from pushing the buttons off-screen on mobile. 50vh = 50% of screen height. */
+            object-fit: contain; /* Ensures the ENTIRE image is visible within the space */
             border-radius: 15px;
             margin-bottom: 20px;
+            display: block; /* Fixes tiny spacing issues */
         }
 
         /* Falling Hearts Background */
@@ -44,7 +46,7 @@
             box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2);
             z-index: 10;
             width: 90%;
-            max-width: 400px;
+            max-width: 600px;
         }
 
         h1 { color: #ff4d6d; font-size: 2rem; }
