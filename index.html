@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffeef2;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Falling Hearts Background */
+        .heart-bg {
+            position: absolute;
+            top: -10%;
+            color: #ff4d6d;
+            font-size: 20px;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2);
+            z-index: 10;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 { color: #ff4d6d; font-size: 2rem; }
+        p { color: #555; }
+
+        .btn-container {
+            margin-top: 30px;
+            position: relative;
+            height: 100px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: bold;
+        }
+
+        #yesBtn {
+            background-color: #ff4d6d;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+        }
+
+        #noBtn {
+            background-color: #f0f0f0;
+            color: #888;
+            position: absolute;
+        }
+
+        /* Success Screen */
+        #success {
+            display: none;
+        }
+        .confetti { font-size: 3rem; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainCard">
+        <h1 id="question">Will you be my Valentine? ❤️</h1>
+        <p>I promise it'll be the best date ever!</p>
+        
+        <div class="btn-container">
+            <button id="yesBtn" onclick="sayYes()">YES</button>
+            <button id="noBtn" onmouseover="moveNo()">No</button>
+        </div>
+    </div>
+
+    <div class="container" id="success">
+        <h1>YAY! ❤️ See you then!</h1>
+        <p>I knew you couldn't say no (technically).</p>
+        <div class="confetti">🥰🌹🍫🍷</div>
+    </div>
+
+    <script>
+        // 1. Make the No button run away
+        function moveNo() {
+            const btn = document.getElementById('noBtn');
+            // Move within a safe zone so it doesn't go off screen
+            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 20);
+            
+            btn.style.position = 'fixed';
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+
+        // 2. Handle the Yes click
+        function sayYes() {
+            document.getElementById('mainCard').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+            document.body.style.backgroundColor = '#ff4d6d';
+            document.querySelector('#success h1').style.color = 'white';
+            document.querySelector('#success p').style.color = 'white';
+        }
+
+        // 3. Create falling hearts background
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-bg');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.opacity = Math.random();
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+        setInterval(createHeart, 300);
+    </script>
+</body>
+</html>
