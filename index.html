@@ -82,8 +82,7 @@
             background-color: #f0f0f0;
             color: #888;
             position: relative; /* Starts centered */
-            transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                        top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.3s ease-out;
             z-index: 1;
             touch-action: none; /* Crucial for mobile */
         }
@@ -124,16 +123,15 @@
         function moveNo(e) {
             const btn = document.getElementById('noBtn');
             
-            // Switch to fixed position on first interaction so it can glide freely
+            // Initial switch to fixed position
             if (btn.style.position !== 'fixed') {
                 const rect = btn.getBoundingClientRect();
                 btn.style.left = rect.left + 'px';
                 btn.style.top = rect.top + 'px';
                 btn.style.position = 'fixed';
-                btn.style.margin = '0'; // Remove any margins that might interfere
+                btn.style.margin = '0';
             }
 
-            // Get cursor position (works for both mouse and touch)
             const mouseX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
             const mouseY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
 
@@ -141,23 +139,26 @@
             const btnCenterX = btnRect.left + btnRect.width / 2;
             const btnCenterY = btnRect.top + btnRect.height / 2;
 
-            // 1. Calculate the angle between cursor and button
+            // Calculate angle and push distance
             const angle = Math.atan2(btnCenterY - mouseY, btnCenterX - mouseX);
+            const pushDist = 180; // Distance it slides away
 
-            // 2. Set the "Push" distance (how far it glides)
-            const distance = 150; 
+            // Calculate intended new position
+            let newX = btnRect.left + Math.cos(angle) * pushDist;
+            let newY = btnRect.top + Math.sin(angle) * pushDist;
 
-            // 3. Calculate new position based on the angle (Directly away from cursor)
-            let newX = btnRect.left + Math.cos(angle) * distance;
-            let newY = btnRect.top + Math.sin(angle) * distance;
+            // --- EDGE COLLISION LOGIC ---
+            const padding = 15; // Space from the edge of the screen
+            const minX = padding;
+            const minY = padding;
+            const maxX = window.innerWidth - btnRect.width - padding;
+            const maxY = window.innerHeight - btnRect.height - padding;
 
-            // 4. Boundary Protection (Keep it on screen)
-            const padding = 20;
-            if (newX < padding) newX = window.innerWidth - btnRect.width - padding;
-            if (newX > window.innerWidth - btnRect.width - padding) newX = padding;
-            if (newY < padding) newY = window.innerHeight - btnRect.height - padding;
-            if (newY > window.innerHeight - btnRect.height - padding) newY = padding;
+            // Instead of wrapping, we clamp the values to the screen edges
+            newX = Math.max(minX, Math.min(newX, maxX));
+            newY = Math.max(minY, Math.min(newY, maxY));
 
+            // Update the button position
             btn.style.left = newX + 'px';
             btn.style.top = newY + 'px';
         }
