@@ -17,6 +17,14 @@
             text-align: center;
         }
 
+        .header-img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover; /* This crops the image nicely without stretching it */
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
         /* Falling Hearts Background */
         .heart-bg {
             position: absolute;
@@ -82,13 +90,14 @@
 <body>
 
     <div class="container" id="mainCard">
-        <h1 id="question">Will you be my Valentine? ❤️</h1>
-        <p>I promise it'll be the best date ever!</p>
+        <img src="https://pbs.twimg.com/media/GI0F6dHW8AA6cCY.jpg" alt="cat-rose" class="header-img">
+        <h1 id="question">Julien will you be my Valentine? ❤️</h1>
         
         <div class="btn-container">
             <button id="yesBtn" onclick="sayYes()">YES</button>
             <button id="noBtn" onmouseover="moveNo()">No</button>
         </div>
+        <p>(make sure you choose the right choice 🔫)</p>
     </div>
 
     <div class="container" id="success">
