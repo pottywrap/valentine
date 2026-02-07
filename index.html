@@ -81,9 +81,11 @@
         #noBtn {
             background-color: #f0f0f0;
             color: #888;
-            transition: all 0.2s ease-out;
+            position: relative; /* Starts centered */
+            transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 1;
-            position: relative; /* Starts relative so it stays in the flex layout! */
+            touch-action: none; /* Crucial for mobile */
         }
 
         /* Success Screen */
@@ -119,26 +121,52 @@
         const successSection = document.getElementById('success');
 
         // 1. The runaway logic
-        function moveNo() {
-            // On the very first hover, we switch from 'relative' (centered) 
-            // to 'fixed' so it can move anywhere on the screen.
-            if (noBtn.style.position !== 'fixed') {
-                noBtn.style.position = 'fixed';
+        function moveNo(e) {
+            const btn = document.getElementById('noBtn');
+            
+            // Switch to fixed position on first interaction so it can glide freely
+            if (btn.style.position !== 'fixed') {
+                const rect = btn.getBoundingClientRect();
+                btn.style.left = rect.left + 'px';
+                btn.style.top = rect.top + 'px';
+                btn.style.position = 'fixed';
+                btn.style.margin = '0'; // Remove any margins that might interfere
             }
 
-            // Calculate a random spot on the screen
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
-            
-            noBtn.style.left = `${x}px`;
-            noBtn.style.top = `${y}px`;
+            // Get cursor position (works for both mouse and touch)
+            const mouseX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const mouseY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+
+            const btnRect = btn.getBoundingClientRect();
+            const btnCenterX = btnRect.left + btnRect.width / 2;
+            const btnCenterY = btnRect.top + btnRect.height / 2;
+
+            // 1. Calculate the angle between cursor and button
+            const angle = Math.atan2(btnCenterY - mouseY, btnCenterX - mouseX);
+
+            // 2. Set the "Push" distance (how far it glides)
+            const distance = 150; 
+
+            // 3. Calculate new position based on the angle (Directly away from cursor)
+            let newX = btnRect.left + Math.cos(angle) * distance;
+            let newY = btnRect.top + Math.sin(angle) * distance;
+
+            // 4. Boundary Protection (Keep it on screen)
+            const padding = 20;
+            if (newX < padding) newX = window.innerWidth - btnRect.width - padding;
+            if (newX > window.innerWidth - btnRect.width - padding) newX = padding;
+            if (newY < padding) newY = window.innerHeight - btnRect.height - padding;
+            if (newY > window.innerHeight - btnRect.height - padding) newY = padding;
+
+            btn.style.left = newX + 'px';
+            btn.style.top = newY + 'px';
         }
 
         // 2. Add the event listener to the "No" button
-        noBtn.addEventListener('mouseover', moveNo);
+        noBtn.addEventListener('mouseover', (e) => moveNo(e));
         noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevents accidental clicks on mobile
-            moveNo();
+            e.preventDefault(); 
+            moveNo(e);
         });
 
         // 3. Handle the "Yes" click
