@@ -68,6 +68,8 @@
             background-color: #f0f0f0;
             color: #888;
             position: absolute;
+            transition: all 0.2s ease-out; /* Makes the move smooth */
+            touch-action: none; /* Prevents scrolling while she tries to tap it */
         }
 
         /* Success Screen */
@@ -96,35 +98,54 @@
     </div>
 
     <script>
-        // 1. Make the No button run away
-        function moveNo() {
-            const btn = document.getElementById('noBtn');
-            // Move within a safe zone so it doesn't go off screen
-            const x = Math.random() * (window.innerWidth - btn.offsetWidth - 20);
-            const y = Math.random() * (window.innerHeight - btn.offsetHeight - 20);
-            
-            btn.style.position = 'fixed';
-            btn.style.left = x + 'px';
-            btn.style.top = y + 'px';
-        }
+        const noBtn = document.getElementById('noBtn');
 
-        // 2. Handle the Yes click
+        // This tracks the mouse movement across the whole page
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            // Get the center position of the "No" button
+            const btnRect = noBtn.getBoundingClientRect();
+            const btnCenterX = btnRect.left + btnRect.width / 2;
+            const btnCenterY = btnRect.top + btnRect.height / 2;
+
+            // Calculate distance between cursor and button center
+            const distance = Math.hypot(x - btnCenterX, y - btnCenterY);
+
+            // If the cursor is closer than 100 pixels, push the button away
+            if (distance < 100) {
+                const angle = Math.atan2(y - btnCenterY, x - btnCenterX);
+                
+                // Calculate the new position (moving 120px in the opposite direction)
+                const newX = btnCenterX - Math.cos(angle) * 120;
+                const newY = btnCenterY - Math.sin(angle) * 120;
+
+                // Keep the button within the screen boundaries
+                const padding = 20;
+                const boundedX = Math.max(padding, Math.min(window.innerWidth - btnRect.width - padding, newX));
+                const boundedY = Math.max(padding, Math.min(window.innerHeight - btnRect.height - padding, newY));
+
+                noBtn.style.left = `${boundedX}px`;
+                noBtn.style.top = `${boundedY}px`;
+                noBtn.style.position = 'fixed';
+            }
+        });
+
+        // Function for the "Yes" button (same as before)
         function sayYes() {
             document.getElementById('mainCard').style.display = 'none';
             document.getElementById('success').style.display = 'block';
             document.body.style.backgroundColor = '#ff4d6d';
-            document.querySelector('#success h1').style.color = 'white';
-            document.querySelector('#success p').style.color = 'white';
         }
 
-        // 3. Create falling hearts background
+        // Falling hearts code (same as before)
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart-bg');
             heart.innerHTML = '❤️';
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.animationDuration = Math.random() * 3 + 2 + 's';
-            heart.style.opacity = Math.random();
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 5000);
         }
