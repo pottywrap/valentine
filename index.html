@@ -54,8 +54,12 @@
 
         .btn-container {
             margin-top: 30px;
+            display: flex;            /* Use flex to align them */
+            justify-content: center;  /* Center them horizontally */
+            gap: 20px;               /* Precise space between them */
+            width: 100%;
             position: relative;
-            height: 100px;
+            height: 60px;
         }
 
         button {
@@ -64,7 +68,6 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.2s;
             font-weight: bold;
         }
 
@@ -72,14 +75,15 @@
             background-color: #ff4d6d;
             color: white;
             box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+            z-index: 2; /* Keeps Yes on top */
         }
 
         #noBtn {
             background-color: #f0f0f0;
             color: #888;
-            position: absolute;
-            transition: all 0.2s ease-out; /* Makes the move smooth */
-            touch-action: none; /* Prevents scrolling while she tries to tap it */
+            transition: all 0.2s ease-out;
+            z-index: 1;
+            position: relative; /* Starts relative so it stays in the flex layout! */
         }
 
         /* Success Screen */
@@ -110,53 +114,47 @@
 
     <script>
         const noBtn = document.getElementById('noBtn');
+        const mainCard = document.getElementById('mainCard');
+        const successSection = document.getElementById('success');
 
-        // This tracks the mouse movement across the whole page
-        document.addEventListener('mousemove', (e) => {
-            const x = e.clientX;
-            const y = e.clientY;
-            
-            // Get the center position of the "No" button
-            const btnRect = noBtn.getBoundingClientRect();
-            const btnCenterX = btnRect.left + btnRect.width / 2;
-            const btnCenterY = btnRect.top + btnRect.height / 2;
-
-            // Calculate distance between cursor and button center
-            const distance = Math.hypot(x - btnCenterX, y - btnCenterY);
-
-            // If the cursor is closer than 100 pixels, push the button away
-            if (distance < 100) {
-                const angle = Math.atan2(y - btnCenterY, x - btnCenterX);
-                
-                // Calculate the new position (moving 120px in the opposite direction)
-                const newX = btnCenterX - Math.cos(angle) * 120;
-                const newY = btnCenterY - Math.sin(angle) * 120;
-
-                // Keep the button within the screen boundaries
-                const padding = 20;
-                const boundedX = Math.max(padding, Math.min(window.innerWidth - btnRect.width - padding, newX));
-                const boundedY = Math.max(padding, Math.min(window.innerHeight - btnRect.height - padding, newY));
-
-                noBtn.style.left = `${boundedX}px`;
-                noBtn.style.top = `${boundedY}px`;
+        // 1. The runaway logic
+        function moveNo() {
+            // On the very first hover, we switch from 'relative' (centered) 
+            // to 'fixed' so it can move anywhere on the screen.
+            if (noBtn.style.position !== 'fixed') {
                 noBtn.style.position = 'fixed';
             }
+
+            // Calculate a random spot on the screen
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
+            
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        }
+
+        // 2. Add the event listener to the "No" button
+        noBtn.addEventListener('mouseover', moveNo);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevents accidental clicks on mobile
+            moveNo();
         });
 
-        // Function for the "Yes" button (same as before)
+        // 3. Handle the "Yes" click
         function sayYes() {
-            document.getElementById('mainCard').style.display = 'none';
-            document.getElementById('success').style.display = 'block';
+            mainCard.style.display = 'none';
+            successSection.style.display = 'block';
             document.body.style.backgroundColor = '#ff4d6d';
         }
 
-        // Falling hearts code (same as before)
+        // 4. Background Hearts Animation
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart-bg');
             heart.innerHTML = '❤️';
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.opacity = Math.random();
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 5000);
         }
