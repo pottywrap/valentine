@@ -192,7 +192,7 @@
 
         // 2. THE COLLAGE GENERATOR
         function createPetCollage() {
-            const petCount = 30; // TOTAL NUMBER OF PETS (Change this for more/less chaos!)
+            const petCount = 90; // TOTAL NUMBER OF PETS (Change this for more/less chaos!)
             
             for (let i = 0; i < petCount; i++) {
                 const img = document.createElement('img');
@@ -203,11 +203,11 @@
                 const side = Math.random() > 0.5 ? 'left' : 'right';
                 
                 // Randomize Position (Keep out of the center card area)
-                const horizPos = (Math.random() * 20); // 0% to 20% from the edge
+                const horizPos = (Math.random() * 10); // 0% to 20% from the edge
                 const vertPos = (Math.random() * 90);  // 0% to 90% from the bottom
                 
                 // Randomize Size and Rotation
-                const size = Math.floor(Math.random() * (160 - 60 + 1)) + 60; // Size between 60px and 160px
+                const size = Math.floor(Math.random() * (320 - 60 + 1)) + 60; // Size between 60px and 160px
                 const rotation = Math.floor(Math.random() * 40) - 20; // -20deg to 20deg
                 const delay = Math.random() * 0.5;
 
