@@ -102,7 +102,7 @@
         
         <div class="btn-container">
             <button id="yesBtn" onclick="sayYes()">YES</button>
-            <button id="noBtn" onmouseover="moveNo()">No</button>
+            <button id="noBtn" onclick="playNoSound(); moveNo(event)">No</button>
         </div>
         <p>(make sure you choose the right choice 🔫)</p>
     </div>
@@ -189,6 +189,28 @@
             setTimeout(() => heart.remove(), 5000);
         }
         setInterval(createHeart, 300);
+    
+        //5. Play No sound 
+        function playNoSound() {
+            const noSound = document.getElementById('noSound');
+            // Reset to start in case she clicks it multiple times fast
+            noSound.currentTime = 0; 
+            noSound.play();
+            
+            // Optional: Make the button shake when clicked
+            const btn = document.getElementById('noBtn');
+            btn.style.transform = "scale(0.8)";
+            setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
+}
     </script>
+
+    <audio id="bgMusic" loop>
+        <source src="PASTE_YOUR_ROMANTIC_SONG_LINK_HERE.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="noSound">
+        <source src="C:\Users\Jimmy-Limited\Development\valentine\dont-do-it-im-a-virgin.mp3" type="audio/mpeg">
+    </audio>
+
 </body>
 </html>
