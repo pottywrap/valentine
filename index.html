@@ -17,28 +17,6 @@
             text-align: center;
         }
 
-        .header-img {
-            width: 100%; /* It will fill the width of the card */
-            height: auto; /* This is crucial! It lets the height adjust naturally so it doesn't stretch */
-            max-height: 50vh; /* Optional safety: Prevents a ridiculously tall portrait photo from pushing the buttons off-screen on mobile. 50vh = 50% of screen height. */
-            object-fit: contain; /* Ensures the ENTIRE image is visible within the space */
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: block; /* Fixes tiny spacing issues */
-        }
-
-        /* Falling Hearts Background */
-        .heart-bg {
-            position: absolute;
-            top: -10%;
-            color: #ff4d6d;
-            font-size: 20px;
-            animation: fall linear infinite;
-        }
-        @keyframes fall {
-            to { transform: translateY(110vh) rotate(360deg); }
-        }
-
         .container {
             background: white;
             padding: 40px;
@@ -47,16 +25,29 @@
             z-index: 10;
             width: 90%;
             max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        h1 { color: #ff4d6d; font-size: 2rem; }
+        .header-img {
+            width: 100%;
+            height: auto;
+            max-height: 50vh;
+            object-fit: contain;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 { color: #ff4d6d; font-size: 2rem; margin: 10px 0; }
         p { color: #555; }
 
         .btn-container {
             margin-top: 30px;
-            display: flex;            /* Use flex to align them */
-            justify-content: center;  /* Center them horizontally */
-            gap: 20px;               /* Precise space between them */
+            display: flex;
+            justify-content: center;
+            gap: 20px;
             width: 100%;
             position: relative;
             height: 60px;
@@ -69,28 +60,41 @@
             border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
+            transition: transform 0.1s ease;
         }
 
         #yesBtn {
             background-color: #ff4d6d;
             color: white;
             box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
-            z-index: 2; /* Keeps Yes on top */
+            z-index: 2;
         }
+        
+        #yesBtn:hover { transform: scale(1.1); }
 
         #noBtn {
             background-color: #f0f0f0;
             color: #888;
-            position: relative; /* Starts centered */
+            position: relative;
             transition: all 0.3s ease-out;
             z-index: 1;
-            touch-action: none; /* Crucial for mobile */
+            touch-action: none;
         }
 
-        /* Success Screen */
-        #success {
-            display: none;
+        /* Falling Hearts Background */
+        .heart-bg {
+            position: absolute;
+            top: -10%;
+            color: #ff4d6d;
+            font-size: 20px;
+            animation: fall linear infinite;
+            pointer-events: none;
         }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        #success { display: none; }
         .confetti { font-size: 3rem; margin-top: 20px; }
     </style>
 </head>
@@ -99,10 +103,9 @@
     <div class="container" id="mainCard">
         <img src="https://pbs.twimg.com/media/GI0F6dHW8AA6cCY.jpg" alt="cat-rose" class="header-img">
         <h1 id="question">Julien will you be my Valentine? ❤️</h1>
-        
         <div class="btn-container">
             <button id="yesBtn" onclick="sayYes()">YES</button>
-            <button id="noBtn" onclick="playNoSound(); moveNo(event)">No</button>
+            <button id="noBtn" onclick="playNoSound()">No</button>
         </div>
         <p>(make sure you choose the right choice 🔫)</p>
     </div>
@@ -114,70 +117,84 @@
         <div class="confetti">🥰🌹🍫🍷</div>
     </div>
 
+    <audio id="yesMusic" loop>
+        <source src="montagem-miau.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="noSound">
+        <source src="dont-do-it-im-a-virgin.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         const noBtn = document.getElementById('noBtn');
         const mainCard = document.getElementById('mainCard');
         const successSection = document.getElementById('success');
+        const yesMusic = document.getElementById('yesMusic');
+        const noSound = document.getElementById('noSound');
 
-        // 1. The runaway logic
+        // 1. Natural Magnetic Movement
         function moveNo(e) {
-            const btn = document.getElementById('noBtn');
-            
-            // Initial switch to fixed position
-            if (btn.style.position !== 'fixed') {
-                const rect = btn.getBoundingClientRect();
-                btn.style.left = rect.left + 'px';
-                btn.style.top = rect.top + 'px';
-                btn.style.position = 'fixed';
-                btn.style.margin = '0';
+            if (noBtn.style.position !== 'fixed') {
+                const rect = noBtn.getBoundingClientRect();
+                noBtn.style.left = rect.left + 'px';
+                noBtn.style.top = rect.top + 'px';
+                noBtn.style.position = 'fixed';
+                noBtn.style.margin = '0';
             }
 
             const mouseX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
             const mouseY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
 
-            const btnRect = btn.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
             const btnCenterX = btnRect.left + btnRect.width / 2;
             const btnCenterY = btnRect.top + btnRect.height / 2;
 
-            // Calculate angle and push distance
             const angle = Math.atan2(btnCenterY - mouseY, btnCenterX - mouseX);
-            const pushDist = 180; // Distance it slides away
+            const pushDist = 180; 
 
-            // Calculate intended new position
             let newX = btnRect.left + Math.cos(angle) * pushDist;
             let newY = btnRect.top + Math.sin(angle) * pushDist;
 
-            // --- EDGE COLLISION LOGIC ---
-            const padding = 15; // Space from the edge of the screen
-            const minX = padding;
-            const minY = padding;
+            // Boundary Clamping
+            const padding = 15;
             const maxX = window.innerWidth - btnRect.width - padding;
             const maxY = window.innerHeight - btnRect.height - padding;
 
-            // Instead of wrapping, we clamp the values to the screen edges
-            newX = Math.max(minX, Math.min(newX, maxX));
-            newY = Math.max(minY, Math.min(newY, maxY));
+            newX = Math.max(padding, Math.min(newX, maxX));
+            newY = Math.max(padding, Math.min(newY, maxY));
 
-            // Update the button position
-            btn.style.left = newX + 'px';
-            btn.style.top = newY + 'px';
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
         }
 
-        // 2. Add the event listener to the "No" button
+        // 2. Event Listeners for Movement
         noBtn.addEventListener('mouseover', (e) => moveNo(e));
         noBtn.addEventListener('touchstart', (e) => {
             e.preventDefault(); 
             moveNo(e);
         });
 
-        // 3. Handle the "Yes" click
+        // 3. Logic if they manage to click "No"
+        function playNoSound() {
+            noSound.currentTime = 0; 
+            noSound.play();
+            
+            // Visual shake/feedback
+            noBtn.style.transform = "scale(0.8)";
+            setTimeout(() => { noBtn.style.transform = "scale(1)"; }, 100);
+        }
+
+        // 4. "Yes" Logic (Music + Screen Switch)
         function sayYes() {
+            // PLAY THE MUSIC
+            yesMusic.play().catch(err => console.log("Audio needs interaction:", err));
+            
             mainCard.style.display = 'none';
-            successSection.style.display = 'block';
+            successSection.style.display = 'flex'; // Changed to flex for centering
             document.body.style.backgroundColor = '#ff4d6d';
         }
 
-        // 4. Background Hearts Animation
+        // 5. Background Hearts
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart-bg');
@@ -189,28 +206,6 @@
             setTimeout(() => heart.remove(), 5000);
         }
         setInterval(createHeart, 300);
-    
-        //5. Play No sound 
-        function playNoSound() {
-            const noSound = document.getElementById('noSound');
-            // Reset to start in case she clicks it multiple times fast
-            noSound.currentTime = 0; 
-            noSound.play();
-            
-            // Optional: Make the button shake when clicked
-            const btn = document.getElementById('noBtn');
-            btn.style.transform = "scale(0.8)";
-            setTimeout(() => { btn.style.transform = "scale(1)"; }, 100);
-}
     </script>
-
-    <audio id="bgMusic" loop>
-        <source src="PASTE_YOUR_ROMANTIC_SONG_LINK_HERE.mp3" type="audio/mpeg">
-    </audio>
-
-    <audio id="noSound">
-        <source src="dont-do-it-im-a-virgin.mp3" type="audio/mpeg">
-    </audio>
-
 </body>
 </html>
