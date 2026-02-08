@@ -85,31 +85,19 @@
         .side-img {
             position: fixed;
             height: auto;
-            display: none; /* Hidden until YES is clicked */
             z-index: 100;
             pointer-events: none;
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+            /* The animation is added via JS class */
         }
-
-        /* LEFT SIDE COLLAGE */
-        .pet-p1 { bottom: 5%;  left: 2%;  width: 150px; transform: rotate(-10deg); }
-        .pet-p2 { bottom: 25%; left: 10%; width: 120px; transform: rotate(5deg);   animation-delay: 0.1s; }
-        .pet-p3 { bottom: 50%; left: 4%;  width: 140px; transform: rotate(-5deg);  animation-delay: 0.2s; }
-        .pet-p4 { bottom: 70%; left: 12%; width: 110px; transform: rotate(15deg);  animation-delay: 0.3s; }
-
-        /* RIGHT SIDE COLLAGE */
-        .pet-p5 { bottom: 5%;  right: 2%;  width: 150px; transform: rotate(10deg); }
-        .pet-p6 { bottom: 25%; right: 10%; width: 120px; transform: rotate(-5deg);  animation-delay: 0.15s; }
-        .pet-p7 { bottom: 50%; right: 4%;  width: 140px; transform: rotate(5deg);   animation-delay: 0.25s; }
-        .pet-p8 { bottom: 70%; right: 12%; width: 110px; transform: rotate(-15deg); animation-delay: 0.35s; }
 
         .bounce-animation {
             animation: party-bounce 0.6s infinite alternate ease-in-out;
         }
 
         @keyframes party-bounce {
-            from { transform: translateY(0) scale(1); }
-            to { transform: translateY(-40px) scale(1.1); }
+            from { transform: translateY(0) rotate(var(--rotation)); }
+            to { transform: translateY(-30px) scale(1.05) rotate(var(--rotation)); }
         }
 
         /* Falling Hearts Background */
@@ -142,16 +130,6 @@
     </div>
 
     <div class="container" id="success">
-        <img src="benny-removebg.png" class="side-img pet-p1" alt="Benny">
-        <img src="taro-removebg.png" class="side-img pet-p2" alt="Taro">
-        <img src="pancake-removebg.png" class="side-img pet-p3" alt="Pancake">
-        <img src="benny-removebg.png" class="side-img pet-p4" alt="Benny">
-
-        <img src="taro-removebg.png" class="side-img pet-p5" alt="Taro">
-        <img src="pancake-removebg.png" class="side-img pet-p6" alt="Pancake">
-        <img src="benny-removebg.png" class="side-img pet-p7" alt="Benny">
-        <img src="taro-removebg.png" class="side-img pet-p8" alt="Taro">
-
         <img src="https://media1.tenor.com/m/TH3--Xt3MgUAAAAd/ai-chinese-cat-dancing.gif" alt="cat-dance" class="header-img">
         <h1>YAY! ❤️ See you then!</h1>
         <p>I knew you couldn't (couldn't) say no 🤠</p>
@@ -161,7 +139,6 @@
     <audio id="yesMusic" loop>
         <source src="montagem-miau.mp3" type="audio/mpeg">
     </audio>
-
     <audio id="noSound">
         <source src="dont-do-it-im-a-virgin.mp3" type="audio/mpeg">
     </audio>
@@ -173,6 +150,10 @@
         const yesMusic = document.getElementById('yesMusic');
         const noSound = document.getElementById('noSound');
 
+        // LIST OF YOUR PET FILES
+        const petImages = ['benny-removebg.png', 'taro-removebg.png', 'pancake-removebg.png'];
+
+        // 1. Natural Magnetic Movement
         function moveNo(e) {
             if (noBtn.style.position !== 'fixed') {
                 const rect = noBtn.getBoundingClientRect();
@@ -181,36 +162,26 @@
                 noBtn.style.position = 'fixed';
                 noBtn.style.margin = '0';
             }
-
             const mouseX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
             const mouseY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-
             const btnRect = noBtn.getBoundingClientRect();
             const btnCenterX = btnRect.left + btnRect.width / 2;
             const btnCenterY = btnRect.top + btnRect.height / 2;
-
             const angle = Math.atan2(btnCenterY - mouseY, btnCenterX - mouseX);
             const pushDist = 180; 
-
             let newX = btnRect.left + Math.cos(angle) * pushDist;
             let newY = btnRect.top + Math.sin(angle) * pushDist;
-
             const padding = 15;
             const maxX = window.innerWidth - btnRect.width - padding;
             const maxY = window.innerHeight - btnRect.height - padding;
-
             newX = Math.max(padding, Math.min(newX, maxX));
             newY = Math.max(padding, Math.min(newY, maxY));
-
             noBtn.style.left = `${newX}px`;
             noBtn.style.top = `${newY}px`;
         }
 
         noBtn.addEventListener('mouseover', (e) => moveNo(e));
-        noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); 
-            moveNo(e);
-        });
+        noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(e); });
 
         function playNoSound() {
             noSound.currentTime = 0; 
@@ -219,26 +190,56 @@
             setTimeout(() => { noBtn.style.transform = "scale(1)"; }, 100);
         }
 
+        // 2. THE COLLAGE GENERATOR
+        function createPetCollage() {
+            const petCount = 30; // TOTAL NUMBER OF PETS (Change this for more/less chaos!)
+            
+            for (let i = 0; i < petCount; i++) {
+                const img = document.createElement('img');
+                img.src = petImages[Math.floor(Math.random() * petImages.length)];
+                img.classList.add('side-img', 'bounce-animation');
+
+                // Randomize Side (Left or Right)
+                const side = Math.random() > 0.5 ? 'left' : 'right';
+                
+                // Randomize Position (Keep out of the center card area)
+                const horizPos = (Math.random() * 20); // 0% to 20% from the edge
+                const vertPos = (Math.random() * 90);  // 0% to 90% from the bottom
+                
+                // Randomize Size and Rotation
+                const size = Math.floor(Math.random() * (160 - 60 + 1)) + 60; // Size between 60px and 160px
+                const rotation = Math.floor(Math.random() * 40) - 20; // -20deg to 20deg
+                const delay = Math.random() * 0.5;
+
+                // Apply Styles
+                img.style[side] = `${horizPos}%`;
+                img.style.bottom = `${vertPos}%`;
+                img.style.width = `${size}px`;
+                img.style.setProperty('--rotation', `${rotation}deg`);
+                img.style.animationDelay = `${delay}s`;
+                img.style.display = 'block';
+
+                document.body.appendChild(img);
+            }
+        }
+
         function sayYes() {
-            yesMusic.play().catch(err => console.log("Audio needs interaction:", err));
+            yesMusic.play().catch(err => console.log(err));
             mainCard.style.display = 'none';
             successSection.style.display = 'flex';
             document.body.style.backgroundColor = '#ff4d6d';
-
-            const bouncers = document.querySelectorAll('.side-img');
-            bouncers.forEach(img => {
-                img.style.display = 'block';
-                img.classList.add('bounce-animation');
-            });
+            
+            // Trigger the Collage!
+            createPetCollage();
         }
 
+        // 3. Background Hearts
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart-bg');
             heart.innerHTML = '❤️';
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.animationDuration = Math.random() * 3 + 2 + 's';
-            heart.style.opacity = Math.random();
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 5000);
         }
