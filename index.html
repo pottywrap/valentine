@@ -81,27 +81,35 @@
             touch-action: none;
         }
 
-        /* --- Success Screen Bouncing Pets --- */
+        /* --- Success Screen Pet Collage --- */
         .side-img {
             position: fixed;
             height: auto;
             display: none; /* Hidden until YES is clicked */
             z-index: 100;
             pointer-events: none;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
         }
 
-        .bouncer-left-1 { bottom: 20px; left: 5%; width: 180px; }
-        .bouncer-right { bottom: 20px; right: 5%; width: 180px; }
-        .bouncer-left-2 { bottom: 140px; left: 2%; width: 150px; z-index: 99; }
+        /* LEFT SIDE COLLAGE */
+        .pet-p1 { bottom: 5%;  left: 2%;  width: 150px; transform: rotate(-10deg); }
+        .pet-p2 { bottom: 25%; left: 10%; width: 120px; transform: rotate(5deg);   animation-delay: 0.1s; }
+        .pet-p3 { bottom: 50%; left: 4%;  width: 140px; transform: rotate(-5deg);  animation-delay: 0.2s; }
+        .pet-p4 { bottom: 70%; left: 12%; width: 110px; transform: rotate(15deg);  animation-delay: 0.3s; }
+
+        /* RIGHT SIDE COLLAGE */
+        .pet-p5 { bottom: 5%;  right: 2%;  width: 150px; transform: rotate(10deg); }
+        .pet-p6 { bottom: 25%; right: 10%; width: 120px; transform: rotate(-5deg);  animation-delay: 0.15s; }
+        .pet-p7 { bottom: 50%; right: 4%;  width: 140px; transform: rotate(5deg);   animation-delay: 0.25s; }
+        .pet-p8 { bottom: 70%; right: 12%; width: 110px; transform: rotate(-15deg); animation-delay: 0.35s; }
 
         .bounce-animation {
-            animation: bounce 0.5s infinite alternate ease-in-out;
+            animation: party-bounce 0.6s infinite alternate ease-in-out;
         }
 
-        @keyframes bounce {
-            from { transform: translateY(0) scale(1) rotate(0deg); }
-            to { transform: translateY(-50px) scale(1.05) rotate(5deg); }
+        @keyframes party-bounce {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-40px) scale(1.1); }
         }
 
         /* Falling Hearts Background */
@@ -134,13 +142,19 @@
     </div>
 
     <div class="container" id="success">
-        <img src="benny-removebg.png" class="side-img bouncer-left-1" alt="Pet 1">
-        <img src="taro-removebg.png" class="side-img bouncer-right" alt="Pet 2">
-        <img src="pancake-removebg.png" class="side-img bouncer-left-2" alt="Pet 3">
+        <img src="benny-removebg.png" class="side-img pet-p1" alt="Benny">
+        <img src="taro-removebg.png" class="side-img pet-p2" alt="Taro">
+        <img src="pancake-removebg.png" class="side-img pet-p3" alt="Pancake">
+        <img src="benny-removebg.png" class="side-img pet-p4" alt="Benny">
+
+        <img src="taro-removebg.png" class="side-img pet-p5" alt="Taro">
+        <img src="pancake-removebg.png" class="side-img pet-p6" alt="Pancake">
+        <img src="benny-removebg.png" class="side-img pet-p7" alt="Benny">
+        <img src="taro-removebg.png" class="side-img pet-p8" alt="Taro">
 
         <img src="https://media1.tenor.com/m/TH3--Xt3MgUAAAAd/ai-chinese-cat-dancing.gif" alt="cat-dance" class="header-img">
         <h1>YAY! ❤️ See you then!</h1>
-        <p>I knew you wouldn't (couldn't) say no 🤠</p>
+        <p>I knew you couldn't (couldn't) say no 🤠</p>
         <div class="confetti">🥰😍😘</div>
     </div>
 
@@ -159,7 +173,6 @@
         const yesMusic = document.getElementById('yesMusic');
         const noSound = document.getElementById('noSound');
 
-        // 1. Natural Magnetic Movement with Edge Clamping
         function moveNo(e) {
             if (noBtn.style.position !== 'fixed') {
                 const rect = noBtn.getBoundingClientRect();
@@ -193,14 +206,12 @@
             noBtn.style.top = `${newY}px`;
         }
 
-        // 2. Listeners for movement
         noBtn.addEventListener('mouseover', (e) => moveNo(e));
         noBtn.addEventListener('touchstart', (e) => {
             e.preventDefault(); 
             moveNo(e);
         });
 
-        // 3. Funny sound if she catches the button
         function playNoSound() {
             noSound.currentTime = 0; 
             noSound.play();
@@ -208,15 +219,12 @@
             setTimeout(() => { noBtn.style.transform = "scale(1)"; }, 100);
         }
 
-        // 4. "Yes" Logic: Music + Screen Switch + Pet Bouncers
         function sayYes() {
             yesMusic.play().catch(err => console.log("Audio needs interaction:", err));
-            
             mainCard.style.display = 'none';
             successSection.style.display = 'flex';
             document.body.style.backgroundColor = '#ff4d6d';
 
-            // Start the pets bouncing
             const bouncers = document.querySelectorAll('.side-img');
             bouncers.forEach(img => {
                 img.style.display = 'block';
@@ -224,7 +232,6 @@
             });
         }
 
-        // 5. Background Decoration (Hearts)
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart-bg');
