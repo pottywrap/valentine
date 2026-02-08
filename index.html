@@ -88,16 +88,21 @@
             z-index: 100;
             pointer-events: none;
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
-            /* The animation is added via JS class */
         }
 
+        /* Snappy, Aggressive Animation */
         .bounce-animation {
-            animation: party-bounce 0.6s infinite alternate ease-in-out;
+            animation: party-bounce 0.35s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes party-bounce {
-            from { transform: translateY(0) rotate(var(--rotation)); }
-            to { transform: translateY(-30px) scale(1.05) rotate(var(--rotation)); }
+            from { 
+                transform: translateY(0) scale(1) rotate(var(--rotation)); 
+            }
+            to { 
+                /* Higher jump and bigger scale for more energy */
+                transform: translateY(-80px) scale(1.2) rotate(calc(var(--rotation) + 10deg)); 
+            }
         }
 
         /* Falling Hearts Background */
@@ -150,10 +155,8 @@
         const yesMusic = document.getElementById('yesMusic');
         const noSound = document.getElementById('noSound');
 
-        // LIST OF YOUR PET FILES
         const petImages = ['benny-removebg.png', 'taro-removebg.png', 'pancake-removebg.png'];
 
-        // 1. Natural Magnetic Movement
         function moveNo(e) {
             if (noBtn.style.position !== 'fixed') {
                 const rect = noBtn.getBoundingClientRect();
@@ -190,28 +193,24 @@
             setTimeout(() => { noBtn.style.transform = "scale(1)"; }, 100);
         }
 
-        // 2. THE COLLAGE GENERATOR
         function createPetCollage() {
-            const petCount = 90; // TOTAL NUMBER OF PETS (Change this for more/less chaos!)
+            const petCount = 90; 
             
             for (let i = 0; i < petCount; i++) {
                 const img = document.createElement('img');
                 img.src = petImages[Math.floor(Math.random() * petImages.length)];
                 img.classList.add('side-img', 'bounce-animation');
 
-                // Randomize Side (Left or Right)
                 const side = Math.random() > 0.5 ? 'left' : 'right';
                 
-                // Randomize Position (Keep out of the center card area)
-                const horizPos = (Math.random() * 30); // 0% to 30% from the edge
-                const vertPos = (Math.random() * 90);  // 0% to 90% from the bottom
+                // Allow pets to swarm up to 30% inward from the edges
+                const horizPos = (Math.random() * 30); 
+                const vertPos = (Math.random() * 95);  
                 
-                // Randomize Size and Rotation
-                const size = Math.floor(Math.random() * (320 - 60 + 1)) + 60; // Size between 60px and 160px
-                const rotation = Math.floor(Math.random() * 40) - 20; // -20deg to 20deg
-                const delay = Math.random() * 0.5;
+                const size = Math.floor(Math.random() * (320 - 60 + 1)) + 60; 
+                const rotation = Math.floor(Math.random() * 40) - 20; 
+                const delay = Math.random() * 0.2; // Fast stagger for more chaos
 
-                // Apply Styles
                 img.style[side] = `${horizPos}%`;
                 img.style.bottom = `${vertPos}%`;
                 img.style.width = `${size}px`;
@@ -228,12 +227,9 @@
             mainCard.style.display = 'none';
             successSection.style.display = 'flex';
             document.body.style.backgroundColor = '#ff4d6d';
-            
-            // Trigger the Collage!
             createPetCollage();
         }
 
-        // 3. Background Hearts
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart-bg');
